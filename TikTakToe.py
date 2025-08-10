@@ -1,13 +1,15 @@
 import os
 import platform
 
+#constants
+win_combo = [[1,2,3],[4,5,6],[7,8,9],[1,4,7],[2,5,8],[3,6,9],[1,5,9],[3,5,7]]
+
+#clear console output
 def clear_console():
     if platform.system=='Windows':
         os.system('cls')
     else:
         os.system('cls')
-
-
 
 def display_board(board):
     print('      |        |       ')
@@ -22,6 +24,16 @@ def display_board(board):
     print(' '+board[1]+'    |   '+board[2]+'    |   '+board[3]+'  ')
     print('      |        |       ')
     return
+
+#check if the player has won -VVIP
+def check_win(board,player):
+    for combo in win_combo:
+        check=[]
+        for pos in combo:
+           check.append(board[pos]==player) 
+        if all(check):
+            return True
+    return False
 
 def assign_marker():
     valid_entry=False
@@ -42,36 +54,8 @@ def assign_marker():
         marker2='X'
     
     return [marker1,marker2]
-
-def possible_victory(board,player):
-    if board[1]!=' ':
-        if board[1]==board[2] and board[2]==board[3]:
-            return True
-    if board[4]!=' ': 
-        if board[4]==board[5] and board[5]==board[6]:
-            return True
-    if board[7]!=' ':
-        if board[7]==board[8] and board[8]==board[9]:
-            return True
-    if board[1]!=' ':
-        if board[1]==board[4] and board[4]==board[7]:
-            return True
-    if board[2]!=' ':
-        if board[2]==board[5] and board[5]==board[8]:
-            return True
-    if board[3]!=' ':
-        if board[3]==board[6] and board[6]==board[9]:
-            return True
-    if board[1]!=' ':
-        if board[1]==board[5] and board[5]==board[9]:
-            return True
-    if board[3]!=' ':
-        if board[3]==board[5] and board[5]==board[7]:
-            return True
-    
-    return False
-        
-def each_entry(board,player,seen,player_no):
+      
+def each_entry(board,player,player_no):
 
     position=0
     validEntry=False
@@ -89,16 +73,27 @@ def each_entry(board,player,seen,player_no):
             continue
         
         #check entry not previously filled
-        if position in seen:
+        if board[position]!=' ':
             print("Position already filled.Enter another unfilled position !!!!")
         else:
-            seen[position]=1
-            validEntry=True
+           validEntry=True
 
     board[position]=player
     display_board(board)
-    return board,seen
+    return board
 
+def play_again():
+    lst=['Y','N']
+    validEntry = False
+
+    while validEntry == False:
+        play = input("Enter Y/N if you want to play again : ")
+        if play in lst:
+            if play=='Y':
+                return True
+            else:
+                return False
+    return
 
 def lets_play():
      #assign board value to blank
@@ -112,26 +107,33 @@ def lets_play():
     P1 = mark[0]
     P2 = mark[1]
 
-    seen={}
     count=0
 
     #take entery -first player followed by second player
     while count < 9:
         if count%2==0:
-          each_entry(board,P1,seen,"Player1")
+          each_entry(board,P1,"Player1")
           count+=1
-          if possible_victory(board,P1):
+          if check_win(board,P1):
               print("Player1 is victorious")
               break
         else:
-            each_entry(board,P2,seen,"Player2")
+            each_entry(board,P2,"Player2")
             count+=1  
-            if possible_victory(board,P2):
+            if check_win(board,P2):
               print("Player2 is victorious")
               break 
 
+        if count==8:
+            print("Match Drawn!!!!!!!!!!!!!!")
+
+    if play_again():
+        clear_console()
+        lets_play()
+    
     return 
 
+#function call for game to start
 clear_console()
 lets_play()
 
